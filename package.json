@@ -1,0 +1,18 @@
+{
+  "name": "pump-station-archive",
+  "version": "1.0.0",
+  "description": "水厂泵站设备档案管理系统",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "seed": "node server/seed.js"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "mssql": "^10.0.2",
+    "multer": "^1.4.5-lts.1"
+  }
+}

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>水厂泵站设备档案管理系统</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">💧</span>
+    <div>
+      <h1>水厂泵站设备档案</h1>
+      <span class="subtitle">Pump Station Equipment Archive</span>
+    </div>
+  </div>
+  <div class="top-actions">
+    <label class="operator-box">操作人
+      <input type="text" id="operator" maxlength="20" placeholder="admin">
+    </label>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" data-view="archive">设备档案</button>
+  <button class="tab" data-view="logs">操作日志</button>
+</nav>
+
+<main>
+  <!-- ============ 设备档案视图 ============ -->
+  <section id="view-archive">
+    <div class="toolbar">
+      <div class="filters">
+        <input type="text" id="kw" placeholder="搜索：泵站名称 / 设备编号 / 名称 / 位置 / 班组" maxlength="60">
+        <select id="statusFilter">
+          <option value="">全部状态</option>
+        </select>
+        <button class="btn primary" id="btnSearch">查询</button>
+        <button class="btn" id="btnReset">重置</button>
+      </div>
+      <button class="btn success" id="btnCreate">＋ 新建档案</button>
+    </div>
+
+    <div class="table-wrap">
+      <table class="grid">
+        <thead>
+          <tr>
+            <th>设备编号</th>
+            <th>泵站名称</th>
+            <th>设备名称/型号</th>
+            <th class="num">功率(kW)</th>
+            <th>安装位置</th>
+            <th>责任班组</th>
+            <th>投运日期</th>
+            <th>运行状态</th>
+            <th class="ops">操作</th>
+          </tr>
+        </thead>
+        <tbody id="gridBody"></tbody>
+      </table>
+      <div class="empty" id="gridEmpty" hidden>暂无符合条件的设备档案</div>
+    </div>
+
+    <div class="pager">
+      <div class="pager-info" id="pagerInfo"></div>
+      <div class="pager-controls">
+        <select id="pageSize">
+          <option value="10">每页 10 条</option>
+          <option value="20">每页 20 条</option>
+          <option value="50">每页 50 条</option>
+        </select>
+        <button class="btn small" id="btnFirst">首页</button>
+        <button class="btn small" id="btnPrev">上一页</button>
+        <span id="pageNumbers" class="page-numbers"></span>
+        <button class="btn small" id="btnNext">下一页</button>
+        <button class="btn small" id="btnLast">末页</button>
+        <span>跳至</span>
+        <input type="number" id="jumpPage" min="1" class="jump">
+        <span>页</span>
+        <button class="btn small" id="btnJump">Go</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 操作日志视图 ============ -->
+  <section id="view-logs" hidden>
+    <div class="toolbar">
+      <div class="filters">
+        <input type="text" id="logKeyword" placeholder="按设备编号/名称过滤（可选）" maxlength="60">
+        <button class="btn primary" id="btnLogSearch">查询</button>
+        <button class="btn" id="btnLogReset">重置</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="grid">
+        <thead>
+          <tr>
+            <th style="width:150px">时间</th>
+            <th style="width:80px">操作</th>
+            <th>内容</th>
+            <th style="width:100px">操作人</th>
+            <th style="width:90px">关联档案</th>
+          </tr>
+        </thead>
+        <tbody id="logBody"></tbody>
+      </table>
+      <div class="empty" id="logEmpty" hidden>暂无操作日志</div>
+    </div>
+    <div class="pager">
+      <div class="pager-info" id="logPagerInfo"></div>
+      <div class="pager-controls">
+        <button class="btn small" id="btnLogPrev">上一页</button>
+        <span id="logPageInfo" class="page-numbers"></span>
+        <button class="btn small" id="btnLogNext">下一页</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ 新建/编辑 弹窗 ============ -->
+<div class="modal-mask" id="formMask" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="formTitle">新建设备档案</h3>
+      <button class="close" data-close="formMask">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="equipForm" class="form-grid">
+        <input type="hidden" id="fId">
+        <label>泵站名称 <em>*</em>
+          <input type="text" id="fStationName" maxlength="100" required>
+        </label>
+        <label>设备编号 <em>*</em>
+          <input type="text" id="fEquipmentCode" maxlength="50" required placeholder="如 BZ-01-001">
+        </label>
+        <label>设备名称/型号
+          <input type="text" id="fEquipmentName" maxlength="100">
+        </label>
+        <label>功率(kW)
+          <input type="number" id="fPowerKw" min="0" step="0.01">
+        </label>
+        <label>安装位置
+          <input type="text" id="fInstallLocation" maxlength="200">
+        </label>
+        <label>责任班组
+          <input type="text" id="fTeamName" maxlength="50">
+        </label>
+        <label>投运日期
+          <input type="date" id="fCommissionDate">
+        </label>
+        <label>运行状态 <em>*</em>
+          <select id="fStatus"></select>
+        </label>
+        <label class="full">备注
+          <textarea id="fRemark" rows="3" maxlength="1000"></textarea>
+        </label>
+      </form>
+      <div class="form-error" id="formError" hidden></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" data-close="formMask">取消</button>
+      <button class="btn primary" id="btnSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 详情 弹窗 ============ -->
+<div class="modal-mask big" id="detailMask" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <h3>设备档案详情</h3>
+      <button class="close" data-close="detailMask">×</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+    <div class="modal-foot">
+      <button class="btn" data-close="detailMask">关闭</button>
+      <button class="btn primary" id="btnDetailEdit">编辑</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+<script src="/app.js"></script>
+</body>
+</html>

@@ -23,3 +23,12 @@ __pycache__/
 *.log
 .env
 .env.*
+
+# 运行时数据与上传文件
+/data/db.json
+/data/db.json.tmp
+/uploads/*
+!/uploads/.gitkeep
+
+# 保留环境变量示例
+!.env.example

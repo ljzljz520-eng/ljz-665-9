@@ -23,3 +23,8 @@ __pycache__/
 *.log
 .env
 .env.*
+
+# 运行时上传的附件（保留目录占位）
+uploads/*
+!uploads/.gitkeep
+!uploads/README.md
